@@ -3,6 +3,7 @@ An implementation of a decision tree classifier to predict the most present age
 in each urban area in the data set.
 """
 import json
+from statistics import mean
 
 import pandas
 from matplotlib import pyplot as plt
@@ -14,11 +15,7 @@ from sklearn.tree import DecisionTreeClassifier
 def main():
     data = read_data_set()
     feature_columns, features, target = prepare_data_set(data)
-
-    # Checks the accuracy of the decision tree classifier with different depths
-    # and test sizes.
-    for depth in range(1, 11):
-        train_decision_tree(depth, features, target)
+    evaluate_classifier_accuracy(features, target)
     # Identifies influence of features in most present age of an urban area.
     visualise_feature_importance(feature_columns, features, target)
 
@@ -53,19 +50,38 @@ def train_decision_tree(depth, features, target):
     classifier = classifier.fit(feature_train, target_train)
     target_prediction = classifier.predict(feature_test)
     # Evaluates the accuracy of the model.
-    print("Depth: {}\nAccuracy: {}%\n".format(
-        depth, metrics.accuracy_score(target_test, target_prediction) * 100))
-    return classifier
+    accuracy = metrics.accuracy_score(target_test, target_prediction) * 100
+    return classifier, accuracy
+
+
+def evaluate_classifier_accuracy(features, target):
+    # Checks the accuracy of the decision tree classifier with different depths
+    # and test sizes.
+    depth_accuracy_dict = {}
+    # Gets the accuracy of five analysis runs for each maximum depth of
+    # decision tree classifier.
+    for _ in range(5):
+        for depth in range(1, 21):
+            classifier, accuracy = train_decision_tree(depth, features, target)
+            key = "Depth {}".format(depth)
+            try:
+                depth_accuracy_dict[key].append(accuracy)
+            except KeyError:
+                depth_accuracy_dict[key] = [accuracy]
+    # Calculates the average accuracy for each maximum depth setting.
+    for key in depth_accuracy_dict.keys():
+        depth_accuracy_dict[key] = mean(depth_accuracy_dict[key])
+    print(json.dumps(depth_accuracy_dict, indent=4) + "\n\n")
 
 
 def visualise_feature_importance(feature_columns, features, target):
     # Generates a bar chart to visualise feature importance.
-    classifier = train_decision_tree(10, features, target)
+    classifier, accuracy = train_decision_tree(10, features, target)
     feature_importance = classifier.feature_importances_
     columns = [column for column in feature_columns]
     plt.bar(columns, feature_importance)
     # Pretty prints the percentage influence of features.
-    importance_dict = dict()
+    importance_dict = {}
     for index, importance in enumerate(feature_importance):
         importance_dict[columns[index]] = importance
     print(json.dumps(importance_dict, indent=4, sort_keys=True))
