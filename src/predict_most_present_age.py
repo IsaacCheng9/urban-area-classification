@@ -2,6 +2,8 @@
 An implementation of a decision tree classifier to predict the most present age
 in each urban area in the data set.
 """
+import json
+
 import pandas
 from matplotlib import pyplot as plt
 from sklearn import metrics
@@ -58,7 +60,14 @@ def visualise_feature_importance(feature_columns, features, target):
     # Generates a bar chart to visualise feature importance.
     classifier = train_decision_tree(10, features, target)
     feature_importance = classifier.feature_importances_
-    plt.bar([column for column in feature_columns], feature_importance)
+    columns = [column for column in feature_columns]
+    plt.bar(columns, feature_importance)
+    # Pretty prints the percentage influence of features.
+    importance_dict = dict()
+    for index, importance in enumerate(feature_importance):
+        importance_dict[columns[index]] = importance
+    print(json.dumps(importance_dict, indent=4, sort_keys=True))
+    # Generates a graph to display the percentage influence of features.
     plt.xticks(rotation="vertical")
     plt.title("Influence of Features in Most Present Age of Urban Areas")
     plt.tight_layout()
