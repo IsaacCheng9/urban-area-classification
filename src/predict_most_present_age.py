@@ -3,6 +3,7 @@ An implementation of a decision tree classifier to predict the most present age
 in each urban area in the data set.
 """
 import pandas
+from sklearn import metrics
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
@@ -25,8 +26,10 @@ def main():
     # Create the decision tree classifier and train it.
     classifier = DecisionTreeClassifier()
     classifier = classifier.fit(feature_train, target_train)
-    target_prediction = classifier.predict(feature_train)
-    print(target_prediction)
+    target_prediction = classifier.predict(feature_test)
+    # Evaluates the accuracy of the model.
+    print("Accuracy: {}".format(
+        metrics.accuracy_score(target_test, target_prediction)))
 
 
 if __name__ == "__main__":
