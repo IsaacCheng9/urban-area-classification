@@ -31,8 +31,10 @@ def read_data_set():
 
 
 def prepare_data_set(data):
-    # Gets all column names from the data set except the most_present_age.
+    # Gets all column names from the data set except cell_id and
+    # most_present_age.
     feature_columns = list(data.columns)
+    feature_columns.remove("cell_id")
     feature_columns.remove("most_present_age")
     # Splits the data set in feature variables and the target variable.
     features = data[feature_columns]
@@ -69,7 +71,8 @@ def visualise_feature_importance(feature_columns, features, target):
     print(json.dumps(importance_dict, indent=4, sort_keys=True))
     # Generates a graph to display the percentage influence of features.
     plt.xticks(rotation="vertical")
-    plt.title("Influence of Features in Most Present Age of Urban Areas")
+    plt.title(
+        "Percentage Influence of Features in Most Present Age of Urban Areas")
     plt.tight_layout()
     plt.show()
 
