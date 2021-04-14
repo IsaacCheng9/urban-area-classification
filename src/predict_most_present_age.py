@@ -3,6 +3,7 @@ An implementation of a decision tree classifier to predict the most present age
 in each urban area in the data set.
 """
 import pandas
+from matplotlib import pyplot as plt
 from sklearn import metrics
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
@@ -10,21 +11,15 @@ from sklearn.tree import DecisionTreeClassifier
 
 def main():
     data = read_data_set()
-    features, target = prepare_data_set(data)
+    feature_columns, features, target = prepare_data_set(data)
 
-    for depth in range(1, 10):
+    # Checks the accuracy of the decision tree classifier with different depths
+    # and test sizes.
+    for depth in range(1, 11):
         for percentage in range(5, 100, 5):
             train_decision_tree(depth, percentage, features, target)
 
-
-def prepare_data_set(data):
-    # Gets all column names from the data set except the most_present_age.
-    feature_columns = list(data.columns)
-    feature_columns.remove("most_present_age")
-    # Splits the data set in feature variables and the target variable.
-    features = data[feature_columns]
-    target = data.most_present_age
-    return features, target
+    visualise_feature_importance(feature_columns, features, target)
 
 
 def read_data_set():
@@ -34,8 +29,18 @@ def read_data_set():
     return data
 
 
+def prepare_data_set(data):
+    # Gets all column names from the data set except the most_present_age.
+    feature_columns = list(data.columns)
+    feature_columns.remove("most_present_age")
+    # Splits the data set in feature variables and the target variable.
+    features = data[feature_columns]
+    target = data.most_present_age
+    return feature_columns, features, target
+
+
 def train_decision_tree(depth, percentage, features, target):
-    # Uses 30% of the data set for the test.
+    # Uses a given percentage of the data set for the test.
     (feature_train, feature_test,
      target_train, target_test) = train_test_split(features, target,
                                                    test_size=(percentage
@@ -49,6 +54,18 @@ def train_decision_tree(depth, percentage, features, target):
     print("Depth: {}\nTest Size: {}%\nAccuracy: {}%\n".format(
         depth, percentage,
         metrics.accuracy_score(target_test, target_prediction) * 100))
+    return classifier
+
+
+def visualise_feature_importance(feature_columns, features, target):
+    # Generates a bar chart to visualise feature importance.
+    classifier = train_decision_tree(10, 0.4, features, target)
+    feature_importance = classifier.feature_importances_
+    plt.bar([column for column in feature_columns], feature_importance)
+    plt.xticks(rotation="vertical")
+    plt.title("Influence of Features in Most Present Age of Urban Areas")
+    plt.tight_layout()
+    plt.show()
 
 
 if __name__ == "__main__":
