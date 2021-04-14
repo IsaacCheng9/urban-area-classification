@@ -16,9 +16,8 @@ def main():
     # Checks the accuracy of the decision tree classifier with different depths
     # and test sizes.
     for depth in range(1, 11):
-        for percentage in range(5, 100, 5):
-            train_decision_tree(depth, percentage, features, target)
-
+        train_decision_tree(depth, features, target)
+    # Identifies influence of features in most present age of an urban area.
     visualise_feature_importance(feature_columns, features, target)
 
 
@@ -39,27 +38,25 @@ def prepare_data_set(data):
     return feature_columns, features, target
 
 
-def train_decision_tree(depth, percentage, features, target):
-    # Uses a given percentage of the data set for the test.
+def train_decision_tree(depth, features, target):
+    # Uses 40% of the data set for the test.
     (feature_train, feature_test,
      target_train, target_test) = train_test_split(features, target,
-                                                   test_size=(percentage
-                                                              / 100),
+                                                   test_size=0.4,
                                                    random_state=1)
     # Create the decision tree classifier and train it.
     classifier = DecisionTreeClassifier(max_depth=depth)
     classifier = classifier.fit(feature_train, target_train)
     target_prediction = classifier.predict(feature_test)
     # Evaluates the accuracy of the model.
-    print("Depth: {}\nTest Size: {}%\nAccuracy: {}%\n".format(
-        depth, percentage,
-        metrics.accuracy_score(target_test, target_prediction) * 100))
+    print("Depth: {}\nAccuracy: {}%\n".format(
+        depth, metrics.accuracy_score(target_test, target_prediction) * 100))
     return classifier
 
 
 def visualise_feature_importance(feature_columns, features, target):
     # Generates a bar chart to visualise feature importance.
-    classifier = train_decision_tree(10, 0.4, features, target)
+    classifier = train_decision_tree(10, features, target)
     feature_importance = classifier.feature_importances_
     plt.bar([column for column in feature_columns], feature_importance)
     plt.xticks(rotation="vertical")
