@@ -131,7 +131,7 @@ def evaluate_feature_importance(feature_columns, features, target):
     """
     # Generates a bar chart to visualise feature importance.
     classifier, _ = train_decision_tree(10, features, target)
-    feature_importance = classifier.feature_importances_
+    feature_importance = classifier.feature_importances_ * 100
 
     # Pretty prints the percentage influence of features.
     columns = [column for column in feature_columns]
@@ -141,12 +141,11 @@ def evaluate_feature_importance(feature_columns, features, target):
     print(json.dumps(importance_dict, indent=4, sort_keys=True))
 
     # Generates a graph to display the percentage influence of features.
-    plt.bar(columns, feature_importance)
+    plt.bar(columns, feature_importance * 100)
     plt.xticks(rotation="vertical")
     plt.xlabel("Urban Feature")
-    plt.ylabel("Influence")
-    plt.title(
-        "Percentage Influence of Features in Most Present Age of Urban Areas")
+    plt.ylabel("Influence (%)")
+    plt.title("Influence of Features in Most Present Age of Urban Areas")
     plt.tight_layout()
     plt.show()
 
