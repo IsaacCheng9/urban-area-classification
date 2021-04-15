@@ -63,7 +63,7 @@ def evaluate_classifier_accuracy(features, target):
     for _ in range(5):
         for depth in range(1, 21):
             classifier, accuracy = train_decision_tree(depth, features, target)
-            key = "Depth {}".format(depth)
+            key = "Average Accuracy for Maximum Depth {}".format(depth)
             try:
                 depth_accuracy_dict[key].append(accuracy)
             except KeyError:
@@ -71,22 +71,39 @@ def evaluate_classifier_accuracy(features, target):
     # Calculates the average accuracy for each maximum depth setting.
     for key in depth_accuracy_dict.keys():
         depth_accuracy_dict[key] = mean(depth_accuracy_dict[key])
+    # Pretty prints the average accuracy values.
     print(json.dumps(depth_accuracy_dict, indent=4) + "\n\n")
+
+    # Generates a graph to display the average accuracy per depth setting.
+    columns = [num for num in range(1, 21)]
+    accuracies = [value for value in depth_accuracy_dict.values()]
+    plt.bar(columns, accuracies)
+    plt.xticks(columns)
+    plt.xlabel("Maximum Depth Level")
+    plt.ylabel("Average Classification Accuracy (%)")
+    plt.title(
+        "Average Accuracy Per Maximum Depth Level of Decision Tree (5 runs)")
+    plt.tight_layout()
+    plt.show()
 
 
 def visualise_feature_importance(feature_columns, features, target):
     # Generates a bar chart to visualise feature importance.
     classifier, accuracy = train_decision_tree(10, features, target)
     feature_importance = classifier.feature_importances_
-    columns = [column for column in feature_columns]
-    plt.bar(columns, feature_importance)
+
     # Pretty prints the percentage influence of features.
+    columns = [column for column in feature_columns]
     importance_dict = {}
     for index, importance in enumerate(feature_importance):
         importance_dict[columns[index]] = importance
     print(json.dumps(importance_dict, indent=4, sort_keys=True))
+
     # Generates a graph to display the percentage influence of features.
+    plt.bar(columns, feature_importance)
     plt.xticks(rotation="vertical")
+    plt.xlabel("Urban Feature")
+    plt.ylabel("Influence")
     plt.title(
         "Percentage Influence of Features in Most Present Age of Urban Areas")
     plt.tight_layout()
