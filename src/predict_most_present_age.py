@@ -95,7 +95,7 @@ def evaluate_classifier_accuracy(features, target):
     # decision tree classifier.
     for _ in range(5):
         for depth in range(1, 21):
-            classifier, accuracy = train_decision_tree(depth, features, target)
+            _, accuracy = train_decision_tree(depth, features, target)
             key = "Average Accuracy for Maximum Depth {}".format(depth)
             try:
                 depth_accuracy_dict[key].append(accuracy)
@@ -130,7 +130,7 @@ def evaluate_feature_importance(feature_columns, features, target):
         target: The attribute to predict.
     """
     # Generates a bar chart to visualise feature importance.
-    classifier, accuracy = train_decision_tree(10, features, target)
+    classifier, _ = train_decision_tree(10, features, target)
     feature_importance = classifier.feature_importances_
 
     # Pretty prints the percentage influence of features.
